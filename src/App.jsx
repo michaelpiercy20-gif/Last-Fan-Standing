@@ -14,29 +14,28 @@ import {
   User,
   UsersRound,
 } from "lucide-react";
-import { motion } from "framer-motion";
 
 const teams = [
   "Arsenal",
   "Aston Villa",
   "Bournemouth",
   "Brentford",
-  "Brighton",
+  "Brighton and Hove Albion",
   "Chelsea",
+  "Coventry City",
   "Crystal Palace",
   "Everton",
   "Fulham",
+  "Hull City",
+  "Ipswich Town",
+  "Leeds United",
   "Liverpool",
   "Manchester City",
   "Manchester United",
   "Newcastle United",
   "Nottingham Forest",
-  "Tottenham Hotspur",
-  "West Ham United",
-  "Wolverhampton Wanderers",
-  "Leeds United",
-  "Burnley",
   "Sunderland",
+  "Tottenham Hotspur",
 ];
 
 const gameweeks = [
@@ -123,6 +122,37 @@ const timeline = [
   { label: "Final", title: "Last fan wins", style: "border-lime-300 bg-lime-300/20" },
 ];
 
+function StatusBadge({ status }) {
+  const isStillIn = status === "Still in";
+
+  return (
+    <span
+      className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${
+        isStillIn ? "bg-lime-300 text-black" : "bg-red-500 text-white"
+      }`}
+    >
+      {status}
+    </span>
+  );
+}
+
+function StatCard({ number, label, colour }) {
+  const styles = {
+    lime: "border-lime-300/40 bg-lime-300/15 text-lime-200",
+    white: "border-white/20 bg-white/10 text-white",
+    red: "border-red-400/40 bg-red-500/20 text-red-100",
+  };
+
+  return (
+    <div className={`rounded-3xl border p-5 text-center ${styles[colour]}`}>
+      <p className="text-4xl font-black">{number}</p>
+      <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-white/80">
+        {label}
+      </p>
+    </div>
+  );
+}
+
 function AuthPage({ onEnter }) {
   const [mode, setMode] = useState("login");
   const [showPassword, setShowPassword] = useState(false);
@@ -147,12 +177,7 @@ function AuthPage({ onEnter }) {
         <div className="absolute -bottom-24 left-16 h-96 w-96 rounded-full bg-emerald-400/20 blur-3xl" />
 
         <div className="relative z-10 grid w-full max-w-6xl gap-8 lg:grid-cols-2 lg:items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45 }}
-            className="text-center lg:text-left"
-          >
+          <div className="text-center lg:text-left">
             <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
               <span className="grid h-11 w-11 place-items-center rounded-2xl bg-lime-300 text-sm font-black text-black">
                 LFS
@@ -177,14 +202,9 @@ function AuthPage({ onEnter }) {
               <StatCard number="1" label="Pick weekly" colour="white" />
               <StatCard number="0" label="Second chances" colour="red" />
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.45, delay: 0.08 }}
-            className="mx-auto w-full max-w-md rounded-[2rem] border border-white/20 bg-white/10 p-6 shadow-2xl shadow-black/30 backdrop-blur"
-          >
+          <div className="mx-auto w-full max-w-md rounded-[2rem] border border-white/20 bg-white/10 p-6 shadow-2xl shadow-black/30 backdrop-blur">
             <div className="mb-6 rounded-[1.5rem] bg-black/55 p-5">
               <p className="text-sm font-black uppercase tracking-[0.22em] text-lime-200">
                 {isSignup ? "Create account" : "Welcome back"}
@@ -277,16 +297,13 @@ function AuthPage({ onEnter }) {
                     type={showPassword ? "text" : "password"}
                     required
                   />
+
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="text-white/60 transition hover:text-white"
                   >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
               </label>
@@ -326,150 +343,128 @@ function AuthPage({ onEnter }) {
                 {isSignup ? "Login instead" : "Create an account"}
               </button>
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
     </main>
   );
 }
 
-function StatCard({ number, label, colour }) {
-  const styles = {
-    lime: "border-lime-300/40 bg-lime-300/15 text-lime-200",
-    white: "border-white/20 bg-white/10 text-white",
-    red: "border-red-400/40 bg-red-500/20 text-red-100",
-  };
-
-  return (
-    <div className={`rounded-3xl border p-5 text-center ${styles[colour]}`}>
-      <p className="text-4xl font-black">{number}</p>
-      <p className="mt-2 text-xs font-black uppercase tracking-[0.18em] text-white/80">
-        {label}
-      </p>
-    </div>
-  );
-}
-
-function ResultsAndCompetitorsTable() {
-  const stillInCount = competitors.filter(
-    (person) => person.status === "Still in"
-  ).length;
-
+function ResultsPage({ onBack, onLogout }) {
+  const stillInCount = competitors.filter((person) => person.status === "Still in").length;
   const outCount = competitors.filter((person) => person.status === "Out").length;
 
   return (
-    <section className="bg-emerald-950 px-5 py-16 text-white sm:px-8 lg:px-12">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-200">
-              Competition tracker
-            </p>
-            <h2 className="mt-3 text-4xl font-black tracking-tight text-white sm:text-5xl">
-              Previous results and players.
-            </h2>
-            <p className="mt-4 max-w-2xl text-lg leading-8 text-white/75">
-              Keep track of who picked who, what happened, and who is still standing.
-            </p>
-          </div>
+    <main className="min-h-screen bg-emerald-950 text-white">
+      <section className="relative min-h-screen overflow-hidden px-5 py-6 sm:px-8 lg:px-12">
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-950 via-black to-lime-950" />
+        <div className="absolute -right-24 top-24 h-72 w-72 rounded-full bg-lime-400/20 blur-3xl" />
+        <div className="absolute -bottom-24 left-24 h-80 w-80 rounded-full bg-emerald-400/20 blur-3xl" />
 
-          <div className="grid grid-cols-2 gap-3 sm:min-w-[260px]">
-            <StatCard number={stillInCount} label="Still in" colour="lime" />
-            <StatCard number={outCount} label="Out" colour="red" />
-          </div>
-        </div>
+        <nav className="relative z-10 mx-auto flex max-w-7xl items-center justify-between border-b border-white/20 pb-5">
+          <button
+            type="button"
+            onClick={onBack}
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/20"
+          >
+            <ChevronLeft className="h-4 w-4" /> Back
+          </button>
 
-        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <div className="rounded-[2rem] border border-white/20 bg-white/10 p-5 shadow-xl shadow-black/20 backdrop-blur">
-            <h3 className="mb-4 text-2xl font-black text-white">
-              Who’s in the competition
-            </h3>
+          <button
+            type="button"
+            onClick={onLogout}
+            className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/20"
+          >
+            Logout
+          </button>
+        </nav>
 
-            <div className="overflow-hidden rounded-2xl border border-white/15">
-              <table className="w-full border-collapse text-left text-sm">
-                <thead className="bg-black/55 text-xs uppercase tracking-[0.18em] text-lime-200">
-                  <tr>
-                    <th className="px-4 py-4">Player</th>
-                    <th className="px-4 py-4">Last pick</th>
-                    <th className="px-4 py-4">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/10">
-                  {competitors.map((person) => (
-                    <tr key={person.name} className="bg-white/5">
-                      <td className="px-4 py-4 font-black text-white">
-                        {person.name}
-                      </td>
-                      <td className="px-4 py-4 font-semibold text-white/75">
-                        {person.lastPick}
-                      </td>
-                      <td className="px-4 py-4">
-                        <StatusBadge status={person.status} />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        <div className="relative z-10 mx-auto max-w-7xl py-12">
+          <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-200">
+                Competition tracker
+              </p>
+              <h1 className="mt-3 text-4xl font-black tracking-tight text-white sm:text-6xl">
+                Results and competitors.
+              </h1>
+              <p className="mt-4 max-w-2xl text-lg leading-8 text-white/75">
+                Keep track of who picked who, what happened, and who is still standing.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 sm:min-w-[260px]">
+              <StatCard number={stillInCount} label="Still in" colour="lime" />
+              <StatCard number={outCount} label="Out" colour="red" />
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-white/20 bg-white/10 p-5 shadow-xl shadow-black/20 backdrop-blur">
-            <h3 className="mb-4 text-2xl font-black text-white">
-              Previous gameweek results
-            </h3>
+          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+            <div className="rounded-[2rem] border border-white/20 bg-white/10 p-5 shadow-xl shadow-black/20 backdrop-blur">
+              <h2 className="mb-4 text-2xl font-black text-white">
+                Who’s in the competition
+              </h2>
 
-            <div className="overflow-x-auto rounded-2xl border border-white/15">
-              <table className="w-full min-w-[680px] border-collapse text-left text-sm">
-                <thead className="bg-black/55 text-xs uppercase tracking-[0.18em] text-lime-200">
-                  <tr>
-                    <th className="px-4 py-4">Gameweek</th>
-                    <th className="px-4 py-4">Player</th>
-                    <th className="px-4 py-4">Team picked</th>
-                    <th className="px-4 py-4">Result</th>
-                    <th className="px-4 py-4">Outcome</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/10">
-                  {previousResults.map((row, index) => (
-                    <tr key={`${row.gameweek}-${row.player}-${index}`} className="bg-white/5">
-                      <td className="px-4 py-4 font-bold text-white/80">
-                        {row.gameweek}
-                      </td>
-                      <td className="px-4 py-4 font-black text-white">
-                        {row.player}
-                      </td>
-                      <td className="px-4 py-4 font-semibold text-white/75">
-                        {row.team}
-                      </td>
-                      <td className="px-4 py-4 font-bold text-white/80">
-                        {row.result}
-                      </td>
-                      <td className="px-4 py-4">
-                        <StatusBadge status={row.status} />
-                      </td>
+              <div className="overflow-hidden rounded-2xl border border-white/15">
+                <table className="w-full border-collapse text-left text-sm">
+                  <thead className="bg-black/55 text-xs uppercase tracking-[0.18em] text-lime-200">
+                    <tr>
+                      <th className="px-4 py-4">Player</th>
+                      <th className="px-4 py-4">Last pick</th>
+                      <th className="px-4 py-4">Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {competitors.map((person) => (
+                      <tr key={person.name} className="bg-white/5">
+                        <td className="px-4 py-4 font-black text-white">{person.name}</td>
+                        <td className="px-4 py-4 font-semibold text-white/75">{person.lastPick}</td>
+                        <td className="px-4 py-4">
+                          <StatusBadge status={person.status} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-white/20 bg-white/10 p-5 shadow-xl shadow-black/20 backdrop-blur">
+              <h2 className="mb-4 text-2xl font-black text-white">
+                Previous gameweek results
+              </h2>
+
+              <div className="overflow-x-auto rounded-2xl border border-white/15">
+                <table className="w-full min-w-[680px] border-collapse text-left text-sm">
+                  <thead className="bg-black/55 text-xs uppercase tracking-[0.18em] text-lime-200">
+                    <tr>
+                      <th className="px-4 py-4">Gameweek</th>
+                      <th className="px-4 py-4">Player</th>
+                      <th className="px-4 py-4">Team picked</th>
+                      <th className="px-4 py-4">Result</th>
+                      <th className="px-4 py-4">Outcome</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {previousResults.map((row, index) => (
+                      <tr key={`${row.gameweek}-${row.player}-${index}`} className="bg-white/5">
+                        <td className="px-4 py-4 font-bold text-white/80">{row.gameweek}</td>
+                        <td className="px-4 py-4 font-black text-white">{row.player}</td>
+                        <td className="px-4 py-4 font-semibold text-white/75">{row.team}</td>
+                        <td className="px-4 py-4 font-bold text-white/80">{row.result}</td>
+                        <td className="px-4 py-4">
+                          <StatusBadge status={row.status} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
-
-function StatusBadge({ status }) {
-  const isStillIn = status === "Still in";
-
-  return (
-    <span
-      className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${
-        isStillIn ? "bg-lime-300 text-black" : "bg-red-500 text-white"
-      }`}
-    >
-      {status}
-    </span>
+      </section>
+    </main>
   );
 }
 
@@ -481,7 +476,10 @@ function TeamPickPage({ userName, onBack, onLogout }) {
 
   function submitPick(event) {
     event.preventDefault();
-    if (!selectedTeam) return;
+
+    if (!selectedTeam) {
+      return;
+    }
 
     setSubmittedPick({
       gameweek: selectedGameweek,
@@ -523,11 +521,7 @@ function TeamPickPage({ userName, onBack, onLogout }) {
         </nav>
 
         <div className="relative z-10 mx-auto grid max-w-7xl gap-8 py-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45 }}
-          >
+          <div>
             <p className="mb-4 inline-flex rounded-full bg-lime-300/20 px-4 py-2 text-sm font-black uppercase tracking-[0.22em] text-lime-200">
               Team selection
             </p>
@@ -565,13 +559,10 @@ function TeamPickPage({ userName, onBack, onLogout }) {
                 </p>
               )}
             </div>
-          </motion.div>
+          </div>
 
-          <motion.form
+          <form
             onSubmit={submitPick}
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.45, delay: 0.08 }}
             className="rounded-[2rem] border border-white/20 bg-white/10 p-6 shadow-2xl shadow-black/30 backdrop-blur"
           >
             <div className="rounded-[1.5rem] bg-black/55 p-5">
@@ -637,17 +628,12 @@ function TeamPickPage({ userName, onBack, onLogout }) {
             >
               Submit pick <ChevronRight className="h-5 w-5" />
             </button>
-          </motion.form>
+          </form>
         </div>
 
         {isConfirmOpen && submittedPick && (
           <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 px-5 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-              className="w-full max-w-md rounded-[2rem] border border-lime-300/40 bg-emerald-950 p-6 text-white shadow-2xl shadow-black/50"
-            >
+            <div className="w-full max-w-md rounded-[2rem] border border-lime-300/40 bg-emerald-950 p-6 text-white shadow-2xl shadow-black/50">
               <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-lime-300 text-black">
                 <CheckCircle2 className="h-9 w-9" />
               </div>
@@ -661,9 +647,7 @@ function TeamPickPage({ userName, onBack, onLogout }) {
                 </h2>
                 <p className="mt-3 text-base font-semibold leading-7 text-white/75">
                   Your pick for{" "}
-                  <span className="text-lime-200">
-                    {submittedPick.gameweek}
-                  </span>{" "}
+                  <span className="text-lime-200">{submittedPick.gameweek}</span>{" "}
                   has been locked in.
                 </p>
               </div>
@@ -691,7 +675,7 @@ function TeamPickPage({ userName, onBack, onLogout }) {
                   Done
                 </button>
               </div>
-            </motion.div>
+            </div>
           </div>
         )}
       </section>
@@ -699,7 +683,7 @@ function TeamPickPage({ userName, onBack, onLogout }) {
   );
 }
 
-function HomePage({ userName, onLogout, onPickTeam }) {
+function HomePage({ userName, onLogout, onPickTeam, onResults }) {
   return (
     <main className="min-h-screen bg-emerald-950 text-white">
       <section className="relative overflow-hidden px-5 py-6 sm:px-8 lg:px-12">
@@ -726,6 +710,14 @@ function HomePage({ userName, onLogout, onPickTeam }) {
 
             <button
               type="button"
+              onClick={onResults}
+              className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/20"
+            >
+              Results
+            </button>
+
+            <button
+              type="button"
               onClick={onLogout}
               className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/20"
             >
@@ -735,12 +727,7 @@ function HomePage({ userName, onLogout, onPickTeam }) {
         </nav>
 
         <div className="relative z-10 mx-auto grid max-w-7xl gap-10 py-14 lg:grid-cols-2 lg:items-center lg:py-20">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45 }}
-            className="max-w-3xl text-white"
-          >
+          <div className="max-w-3xl text-white">
             <p className="mb-4 inline-flex rounded-full bg-lime-300/20 px-4 py-2 text-sm font-bold uppercase tracking-[0.22em] text-lime-200">
               Welcome, {userName}
             </p>
@@ -766,14 +753,9 @@ function HomePage({ userName, onLogout, onPickTeam }) {
                 If nobody survives, the pot rolls over.
               </span>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.aside
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.45, delay: 0.08 }}
-            className="rounded-[2rem] border border-white/20 bg-white/10 p-6 text-white shadow-2xl shadow-black/30 backdrop-blur"
-          >
+          <aside className="rounded-[2rem] border border-white/20 bg-white/10 p-6 text-white shadow-2xl shadow-black/30 backdrop-blur">
             <div className="rounded-[1.5rem] bg-black/55 p-5">
               <p className="text-sm font-black uppercase tracking-[0.22em] text-lime-200">
                 Survival rule
@@ -794,7 +776,7 @@ function HomePage({ userName, onLogout, onPickTeam }) {
                 Draw or lose = eliminated
               </p>
             </div>
-          </motion.aside>
+          </aside>
         </div>
       </section>
 
@@ -814,8 +796,6 @@ function HomePage({ userName, onLogout, onPickTeam }) {
           </p>
         </div>
       </section>
-
-      <ResultsAndCompetitorsTable />
 
       <section id="rules" className="bg-emerald-950 px-5 py-16 text-white sm:px-8 lg:px-12">
         <div className="mx-auto max-w-7xl">
@@ -841,13 +821,8 @@ function HomePage({ userName, onLogout, onPickTeam }) {
                     <Icon className="h-6 w-6" />
                   </div>
 
-                  <h3 className="text-xl font-black text-white">
-                    {rule.title}
-                  </h3>
-
-                  <p className="mt-3 leading-7 text-white/85">
-                    {rule.text}
-                  </p>
+                  <h3 className="text-xl font-black text-white">{rule.title}</h3>
+                  <p className="mt-3 leading-7 text-white/85">{rule.text}</p>
                 </article>
               );
             })}
@@ -877,11 +852,9 @@ function HomePage({ userName, onLogout, onPickTeam }) {
             <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-200">
               The goal
             </p>
-
             <h2 className="mx-auto mt-3 max-w-3xl text-4xl font-black tracking-tight text-white sm:text-5xl">
               Be the final name left when the whistle goes.
             </h2>
-
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/85">
               Outlast the crowd by backing winners without burning through your strongest clubs too early.
             </p>
@@ -922,10 +895,23 @@ export default function App() {
     );
   }
 
+  if (currentPage === "results") {
+    return (
+      <ResultsPage
+        onBack={() => setCurrentPage("home")}
+        onLogout={() => {
+          setIsLoggedIn(false);
+          setCurrentPage("home");
+        }}
+      />
+    );
+  }
+
   return (
     <HomePage
       userName={userName}
       onPickTeam={() => setCurrentPage("pick")}
+      onResults={() => setCurrentPage("results")}
       onLogout={() => {
         setIsLoggedIn(false);
         setCurrentPage("home");

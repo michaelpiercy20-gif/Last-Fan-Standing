@@ -351,8 +351,13 @@ function AuthPage({ onEnter }) {
 }
 
 function ResultsPage({ onBack, onLogout }) {
-  const stillInCount = competitors.filter((person) => person.status === "Still in").length;
-  const outCount = competitors.filter((person) => person.status === "Out").length;
+  const stillInCount = previousResults.filter(
+    (person) => person.status === "Still in"
+  ).length;
+
+  const outCount = previousResults.filter(
+    (person) => person.status === "Out"
+  ).length;
 
   return (
     <main className="min-h-screen bg-emerald-950 text-white">
@@ -385,9 +390,11 @@ function ResultsPage({ onBack, onLogout }) {
               <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-200">
                 Competition tracker
               </p>
+
               <h1 className="mt-3 text-4xl font-black tracking-tight text-white sm:text-6xl">
-                Results and competitors.
+                Previous gameweek results.
               </h1>
+
               <p className="mt-4 max-w-2xl text-lg leading-8 text-white/75">
                 Keep track of who picked who, what happened, and who is still standing.
               </p>
@@ -399,67 +406,52 @@ function ResultsPage({ onBack, onLogout }) {
             </div>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-            <div className="rounded-[2rem] border border-white/20 bg-white/10 p-5 shadow-xl shadow-black/20 backdrop-blur">
-              <h2 className="mb-4 text-2xl font-black text-white">
-                Who’s in the competition
-              </h2>
+          <div className="mx-auto max-w-6xl rounded-[2rem] border border-white/20 bg-white/10 p-5 shadow-xl shadow-black/20 backdrop-blur">
+            <h2 className="mb-4 text-2xl font-black text-white">
+              Previous gameweek results
+            </h2>
 
-              <div className="overflow-hidden rounded-2xl border border-white/15">
-                <table className="w-full border-collapse text-left text-sm">
-                  <thead className="bg-black/55 text-xs uppercase tracking-[0.18em] text-lime-200">
-                    <tr>
-                      <th className="px-4 py-4">Player</th>
-                      <th className="px-4 py-4">Last pick</th>
-                      <th className="px-4 py-4">Status</th>
+            <div className="overflow-x-auto rounded-2xl border border-white/15">
+              <table className="w-full min-w-[680px] border-collapse text-left text-sm">
+                <thead className="bg-black/55 text-xs uppercase tracking-[0.18em] text-lime-200">
+                  <tr>
+                    <th className="px-4 py-4">Gameweek</th>
+                    <th className="px-4 py-4">Player</th>
+                    <th className="px-4 py-4">Team picked</th>
+                    <th className="px-4 py-4">Result</th>
+                    <th className="px-4 py-4">Outcome</th>
+                  </tr>
+                </thead>
+
+                <tbody className="divide-y divide-white/10">
+                  {previousResults.map((row, index) => (
+                    <tr
+                      key={`${row.gameweek}-${row.player}-${index}`}
+                      className="bg-white/5"
+                    >
+                      <td className="px-4 py-4 font-bold text-white/80">
+                        {row.gameweek}
+                      </td>
+
+                      <td className="px-4 py-4 font-black text-white">
+                        {row.player}
+                      </td>
+
+                      <td className="px-4 py-4 font-semibold text-white/75">
+                        {row.team}
+                      </td>
+
+                      <td className="px-4 py-4 font-bold text-white/80">
+                        {row.result}
+                      </td>
+
+                      <td className="px-4 py-4">
+                        <StatusBadge status={row.status} />
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/10">
-                    {competitors.map((person) => (
-                      <tr key={person.name} className="bg-white/5">
-                        <td className="px-4 py-4 font-black text-white">{person.name}</td>
-                        <td className="px-4 py-4 font-semibold text-white/75">{person.lastPick}</td>
-                        <td className="px-4 py-4">
-                          <StatusBadge status={person.status} />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-white/20 bg-white/10 p-5 shadow-xl shadow-black/20 backdrop-blur">
-              <h2 className="mb-4 text-2xl font-black text-white">
-                Previous gameweek results
-              </h2>
-
-              <div className="overflow-x-auto rounded-2xl border border-white/15">
-                <table className="w-full min-w-[680px] border-collapse text-left text-sm">
-                  <thead className="bg-black/55 text-xs uppercase tracking-[0.18em] text-lime-200">
-                    <tr>
-                      <th className="px-4 py-4">Gameweek</th>
-                      <th className="px-4 py-4">Player</th>
-                      <th className="px-4 py-4">Team picked</th>
-                      <th className="px-4 py-4">Result</th>
-                      <th className="px-4 py-4">Outcome</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/10">
-                    {previousResults.map((row, index) => (
-                      <tr key={`${row.gameweek}-${row.player}-${index}`} className="bg-white/5">
-                        <td className="px-4 py-4 font-bold text-white/80">{row.gameweek}</td>
-                        <td className="px-4 py-4 font-black text-white">{row.player}</td>
-                        <td className="px-4 py-4 font-semibold text-white/75">{row.team}</td>
-                        <td className="px-4 py-4 font-bold text-white/80">{row.result}</td>
-                        <td className="px-4 py-4">
-                          <StatusBadge status={row.status} />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
